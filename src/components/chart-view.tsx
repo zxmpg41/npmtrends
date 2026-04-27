@@ -107,7 +107,7 @@ export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps)
         })
 
         // Sort by date just in case
-        setData(Array.from(daysMap.values()).sort((a, b) => a.date.localeCompare(b.date)))
+        setData(Array.from(daysMap.values()).sort((a, b) => String(a.date).localeCompare(String(b.date))))
       } catch (err) {
         if (isMounted) {
           setError(err instanceof Error ? err.message : "Failed to load data")
