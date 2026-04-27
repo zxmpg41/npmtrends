@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 
-export interface NpmSearchResult {
+interface NpmSearchResult {
   package: {
     name: string
     description: string
