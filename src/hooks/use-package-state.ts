@@ -28,14 +28,14 @@ export function usePackageState() {
 
   const [timeRange, setTimeRange] = useState<string>(() => {
     const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
-    return params.get("range") || "last-year"
+    return params.get("range") || "last-3-months"
   })
 
   const setTimeRangeWithUrl = (newRange: string) => {
     setTimeRange(newRange)
     const params = new URLSearchParams(window.location.search)
     
-    if (newRange && newRange !== "last-year") {
+    if (newRange && newRange !== "last-3-months") {
       params.set("range", newRange)
     } else {
       params.delete("range")
