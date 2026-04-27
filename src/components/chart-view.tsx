@@ -42,20 +42,21 @@ const TIME_RANGE_LABELS: Record<string, string> = {
 }
 
 export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps) {
-  const [data, setData] = useState<Record<string, any>[]>([])
+  const [data, setData] = useState<Record<string, string | number>[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  if (packages.length === 0 && data.length > 0) {
+    setData([])
+    setError(null)
+  }
+
   useEffect(() => {
     if (packages.length === 0) {
-      setData([])
-      setError(null)
       return
     }
 
     let isMounted = true
-    setIsLoading(true)
-    setError(null)
 
     // Parse specific time periods that npmjs API understands:
     // last-day, last-week, last-month, last-year
@@ -70,6 +71,8 @@ export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps)
     }
 
     const fetchData = async () => {
+      setIsLoading(true)
+      setError(null)
       try {
         const todayStr = new Date().toISOString().split("T")[0]
 
@@ -86,7 +89,7 @@ export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps)
         
         if (!isMounted) return
 
-        const daysMap = new Map<string, any>()
+        const daysMap = new Map<string, Record<string, string | number>>()
 
         results.forEach((result) => {
           if (result.status === "fulfilled") {

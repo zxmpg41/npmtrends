@@ -27,11 +27,6 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
 
   const { results, isLoading } = useNpmSearch(query)
 
-  // Reset selected index when results change
-  useEffect(() => {
-    setSelectedIndex(0)
-  }, [results])
-
   // Click outside to close dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -86,6 +81,11 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
     } else if (e.key === "Escape") {
       setIsOpen(false)
     }
+  }
+
+  // Reset selected index when query changes
+  if (query && selectedIndex !== 0 && results.length > 0 && query !== results[selectedIndex]?.package?.name) {
+    setSelectedIndex(0)
   }
 
   const handleRemove = (pkg: string) => {

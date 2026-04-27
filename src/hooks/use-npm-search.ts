@@ -14,7 +14,8 @@ export function useNpmSearch(query: string) {
 
   useEffect(() => {
     if (!query) {
-      setResults([])
+      // Intentionally avoiding immediate state update when query is empty
+      // so it doesn't cause a layout jump while typing
       return
     }
 
@@ -35,6 +36,11 @@ export function useNpmSearch(query: string) {
 
     return () => clearTimeout(delay)
   }, [query])
+
+  // Explicitly clear results when query becomes empty
+  if (!query && results.length > 0) {
+    setResults([])
+  }
 
   return { results, isLoading }
 }
