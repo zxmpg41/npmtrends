@@ -17,7 +17,7 @@ function App() {
         <div className="container mx-auto flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0 px-4">
           <div className="flex gap-2 items-center">
             <div className="h-8 w-8 flex items-center justify-center">
-              <img src="/logo.png" alt="npm trends logo" className="h-full w-full object-contain" />
+              <img src="./logo.png" alt="npm trends logo" className="h-full w-full object-contain" />
             </div>
             <h1 className="text-xl font-bold">npm trends</h1>
           </div>
