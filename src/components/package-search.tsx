@@ -83,6 +83,15 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
     }
   }
 
+  useEffect(() => {
+    if (isOpen && results.length > 0) {
+      const selectedEl = document.getElementById(`search-result-${selectedIndex}`)
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest' })
+      }
+    }
+  }, [selectedIndex, isOpen, results])
+
   // Reset selected index when query changes
   if (query && selectedIndex !== 0 && results.length > 0 && query !== results[0]?.package?.name && query.length !== results[0]?.package?.name?.length) {
     setSelectedIndex(0)
@@ -114,9 +123,10 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
       </div>
 
       {isOpen && query && results.length > 0 && (
-        <div className="absolute top-12 left-0 right-0 z-50 mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-auto">
+        <div id="search-results-list" className="absolute top-12 left-0 right-0 z-50 mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-auto">
           {results.map((res, index) => (
             <div
+              id={`search-result-${index}`}
               key={res.package.name}
               className={cn(
                 "px-4 py-2 cursor-pointer flex items-center justify-between transition-colors",
