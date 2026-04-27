@@ -119,7 +119,7 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
             <div
               key={res.package.name}
               className={cn(
-                "px-4 py-2 cursor-pointer flex flex-col items-start text-left transition-colors",
+                "px-4 py-2 cursor-pointer flex items-center justify-between transition-colors",
                 index === selectedIndex ? "bg-accent text-accent-foreground" : "hover:bg-muted"
               )}
               onMouseEnter={() => setSelectedIndex(index)}
@@ -128,11 +128,16 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
                 handleAddPackage(res.package.name)
               }}
             >
-              <div className="font-semibold">{res.package.name}</div>
-              {res.package.description && (
-                <div className="text-xs text-muted-foreground truncate w-full">
-                  {res.package.description}
-                </div>
+              <div className="flex flex-col items-start text-left min-w-0 mr-4 flex-1">
+                <div className="font-semibold truncate w-full">{res.package.name}</div>
+                {res.package.description && (
+                  <div className="text-xs text-muted-foreground truncate w-full">
+                    {res.package.description}
+                  </div>
+                )}
+              </div>
+              {res.package.version && (
+                <div className="text-xs text-muted-foreground whitespace-nowrap">v{res.package.version}</div>
               )}
             </div>
           ))}
