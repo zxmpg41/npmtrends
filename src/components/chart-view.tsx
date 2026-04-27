@@ -181,6 +181,7 @@ export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps)
                 tickLine={false}
                 axisLine={false}
                 tickMargin={10}
+                tick={{ fill: "var(--color-muted-foreground)" }}
                 tickFormatter={(value) => {
                   const date = new Date(value)
                   return date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
@@ -190,6 +191,7 @@ export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps)
               <YAxis
                 tickLine={false}
                 axisLine={false}
+                tick={{ fill: "var(--color-muted-foreground)" }}
                 tickFormatter={(value) => {
                   if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
                   if (value >= 1000) return `${(value / 1000).toFixed(1)}k`
