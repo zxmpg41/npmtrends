@@ -4,9 +4,7 @@ This is a project to analyze the trends of NPM packages. It uses the NPM registr
 
 ## Todos
 
-- [x] Deploy to github pages
-- [] Find a new name for the project
-- [x] Add version number to npm search results similar to npmjs.com
+- [ ] Find a new name for the project
 
 ## 1. Tech Stack & Deployment
 
