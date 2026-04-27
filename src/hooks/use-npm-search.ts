@@ -1,0 +1,40 @@
+import { useState, useEffect } from "react"
+
+export interface NpmSearchResult {
+  package: {
+    name: string
+    description: string
+    version: string
+  }
+}
+
+export function useNpmSearch(query: string) {
+  const [results, setResults] = useState<NpmSearchResult[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    if (!query) {
+      setResults([])
+      return
+    }
+
+    const delay = setTimeout(async () => {
+      setIsLoading(true)
+      try {
+        const res = await fetch(`https://registry.npmjs.org/-/v1/search?text=${encodeURIComponent(query)}&size=10`)
+        if (res.ok) {
+          const data = await res.json()
+          setResults(data.objects || [])
+        }
+      } catch (err) {
+        console.error("Search error", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(delay)
+  }, [query])
+
+  return { results, isLoading }
+}
