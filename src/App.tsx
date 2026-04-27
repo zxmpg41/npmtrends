@@ -4,7 +4,7 @@ import { ChartView } from "./components/chart-view"
 import { usePackageState } from "./hooks/use-package-state"
 
 function App() {
-  const [packages, setPackages] = usePackageState()
+  const { packages, setPackages, timeRange, setTimeRange } = usePackageState()
 
   const subtitle =
     packages.length > 0
@@ -36,7 +36,7 @@ function App() {
           <PackageSearch packages={packages} setPackages={setPackages} />
         </div>
 
-        <ChartView packages={packages} />
+        <ChartView packages={packages} timeRange={timeRange} setTimeRange={setTimeRange} />
       </main>
     </div>
   )

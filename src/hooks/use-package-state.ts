@@ -26,5 +26,29 @@ export function usePackageState() {
     })
   }
 
-  return [packages, setPackagesWithUrl] as const
+  const [timeRange, setTimeRange] = useState<string>(() => {
+    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+    return params.get("range") || "last-year"
+  })
+
+  const setTimeRangeWithUrl = (newRange: string) => {
+    setTimeRange(newRange)
+    const params = new URLSearchParams(window.location.search)
+    
+    if (newRange && newRange !== "last-year") {
+      params.set("range", newRange)
+    } else {
+      params.delete("range")
+    }
+    
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`
+    window.history.replaceState({}, "", newUrl)
+  }
+
+  return { 
+    packages, 
+    setPackages: setPackagesWithUrl,
+    timeRange,
+    setTimeRange: setTimeRangeWithUrl
+  } as const
 }

@@ -16,8 +16,18 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 interface ChartViewProps {
   packages: string[]
+  timeRange: string
+  setTimeRange: (range: string) => void
 }
 
 interface NpmDownloadData {
@@ -25,7 +35,13 @@ interface NpmDownloadData {
   day: string
 }
 
-export function ChartView({ packages }: ChartViewProps) {
+const TIME_RANGE_LABELS: Record<string, string> = {
+  "last-month": "Last Month",
+  "last-3-months": "Last 3 Months",
+  "last-year": "Last Year",
+}
+
+export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps) {
   const [data, setData] = useState<Record<string, any>[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -41,10 +57,22 @@ export function ChartView({ packages }: ChartViewProps) {
     setIsLoading(true)
     setError(null)
 
+    // Parse specific time periods that npmjs API understands:
+    // last-day, last-week, last-month, last-year
+    // Or a range: YYYY-MM-DD:YYYY-MM-DD
+    let apiRange = timeRange
+    if (timeRange === "last-3-months") {
+      const today = new Date()
+      const end = today.toISOString().split("T")[0]
+      today.setMonth(today.getMonth() - 3)
+      const start = today.toISOString().split("T")[0]
+      apiRange = `${start}:${end}`
+    }
+
     const fetchData = async () => {
       try {
         const fetchPromises = packages.map((pkg) =>
-          fetch(`https://api.npmjs.org/downloads/range/last-year/${pkg}`)
+          fetch(`https://api.npmjs.org/downloads/range/${apiRange}/${pkg}`)
             .then((res) => {
               if (!res.ok) throw new Error(`Failed to fetch ${pkg}`)
               return res.json()
@@ -89,7 +117,7 @@ export function ChartView({ packages }: ChartViewProps) {
     return () => {
       isMounted = false
     }
-  }, [packages])
+  }, [packages, timeRange])
 
   const chartConfig = useMemo(() => {
     const config: ChartConfig = {}
@@ -108,23 +136,37 @@ export function ChartView({ packages }: ChartViewProps) {
 
   return (
     <Card className="w-full h-[500px] flex flex-col">
-      <CardHeader>
-        <CardTitle>Downloads (Last Year)</CardTitle>
-        <CardDescription>
-          {isLoading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" /> Loading data...
-            </span>
-          ) : error ? (
-            <span className="flex items-center gap-2 text-destructive">
-              <AlertCircle className="w-4 h-4" /> {error}
-            </span>
-          ) : (
-            "Showing daily downloads for selected packages"
-          )}
-        </CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between pb-2">
+        <div className="space-y-1">
+          <CardTitle>Downloads</CardTitle>
+          <CardDescription>
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading data...
+              </span>
+            ) : error ? (
+              <span className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="w-4 h-4" /> {error}
+              </span>
+            ) : (
+              "Showing daily downloads for selected packages"
+            )}
+          </CardDescription>
+        </div>
+        <Select value={timeRange} onValueChange={(val) => val && setTimeRange(val)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a time range">
+              {TIME_RANGE_LABELS[timeRange]}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="last-month">Last Month</SelectItem>
+            <SelectItem value="last-3-months">Last 3 Months</SelectItem>
+            <SelectItem value="last-year">Last Year</SelectItem>
+          </SelectContent>
+        </Select>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0">
+      <CardContent className="flex-1 min-h-0 pt-4">
         {!isLoading && data.length > 0 && (
           <ChartContainer config={chartConfig} className="h-full w-full">
             <LineChart data={data} margin={{ top: 10, right: 10, bottom: 20, left: 10 }}>

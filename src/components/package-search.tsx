@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react"
-import { X, Search, Loader2 } from "lucide-react"
+import { Search, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { useNpmSearch } from "@/hooks/use-npm-search"
+import { cn } from "@/lib/utils"
 
 const CHART_COLORS = [
   "var(--chart-1)",
@@ -21,8 +23,14 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
   const [query, setQuery] = useState("")
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
   const { results, isLoading } = useNpmSearch(query)
+
+  // Reset selected index when results change
+  useEffect(() => {
+    setSelectedIndex(0)
+  }, [results])
 
   // Click outside to close dropdown
   useEffect(() => {
@@ -55,8 +63,28 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && query) {
-      handleAddPackage(query)
+    if (!isOpen || results.length === 0) {
+      if (e.key === "Enter" && query) {
+        handleAddPackage(query)
+      }
+      return
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev))
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev))
+    } else if (e.key === "Enter") {
+      e.preventDefault()
+      if (selectedIndex >= 0 && selectedIndex < results.length) {
+        handleAddPackage(results[selectedIndex].package.name)
+      } else if (query) {
+        handleAddPackage(query)
+      }
+    } else if (e.key === "Escape") {
+      setIsOpen(false)
     }
   }
 
@@ -87,10 +115,14 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
 
       {isOpen && query && results.length > 0 && (
         <div className="absolute top-12 left-0 right-0 z-50 mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-auto">
-          {results.map((res) => (
+          {results.map((res, index) => (
             <div
               key={res.package.name}
-              className="px-4 py-2 hover:bg-muted cursor-pointer flex flex-col items-start text-left"
+              className={cn(
+                "px-4 py-2 cursor-pointer flex flex-col items-start text-left transition-colors",
+                index === selectedIndex ? "bg-accent text-accent-foreground" : "hover:bg-muted"
+              )}
+              onMouseEnter={() => setSelectedIndex(index)}
               onMouseDown={(e) => {
                 e.preventDefault() // prevent input blur
                 handleAddPackage(res.package.name)
@@ -108,27 +140,28 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
       )}
 
       {packages.length > 0 && (
-        <div className="flex flex-wrap gap-2 justify-center mt-4">
-          {packages.map((pkg, idx) => (
-            <Badge
-              key={pkg}
-              variant="outline"
-              className="flex items-center gap-1 px-3 py-1.5 text-sm bg-background"
-              style={{ borderColor: CHART_COLORS[idx % CHART_COLORS.length] }}
-            >
-              <div
-                className="w-2.5 h-2.5 rounded-full"
+        <div className="flex flex-col items-center gap-3 mt-4">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {packages.map((pkg, idx) => (
+              <Badge
+                key={pkg}
+                className="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-900 transition-all hover:opacity-80 hover:line-through hover:shadow-md"
                 style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
-              />
-              {pkg}
-              <button
-                className="ml-1 rounded-full p-0.5 hover:bg-muted"
                 onClick={() => handleRemove(pkg)}
+                title={`Remove ${pkg}`}
               >
-                <X className="w-3 h-3" />
-              </button>
-            </Badge>
-          ))}
+                {pkg}
+              </Badge>
+            ))}
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setPackages([])} 
+            className="text-muted-foreground hover:text-foreground h-8 text-xs px-3"
+          >
+            Clear all
+          </Button>
         </div>
       )}
     </div>
