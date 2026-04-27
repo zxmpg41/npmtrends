@@ -84,7 +84,7 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
   }
 
   // Reset selected index when query changes
-  if (query && selectedIndex !== 0 && results.length > 0 && query !== results[selectedIndex]?.package?.name) {
+  if (query && selectedIndex !== 0 && results.length > 0 && query !== results[0]?.package?.name && query.length !== results[0]?.package?.name?.length) {
     setSelectedIndex(0)
   }
 
