@@ -71,6 +71,8 @@ export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps)
 
     const fetchData = async () => {
       try {
+        const todayStr = new Date().toISOString().split("T")[0]
+
         const fetchPromises = packages.map((pkg) =>
           fetch(`https://api.npmjs.org/downloads/range/${apiRange}/${pkg}`)
             .then((res) => {
@@ -89,15 +91,15 @@ export function ChartView({ packages, timeRange, setTimeRange }: ChartViewProps)
         results.forEach((result) => {
           if (result.status === "fulfilled") {
             result.value.downloads?.forEach((d) => {
+              // Exclude today's data points because they are incomplete (often 0)
+              if (d.day === todayStr) return;
+
               const existing = daysMap.get(d.day) || { date: d.day }
               existing[result.value.pkg] = d.downloads
               daysMap.set(d.day, existing)
             })
           } else {
             console.error(result.reason)
-            // If one fails, we can either ignore it or show an error.
-            // The plan says "If an API call fails or package doesn't exist, the chip is still added but no line will render."
-            // So we just log the error and ignore.
           }
         })
 

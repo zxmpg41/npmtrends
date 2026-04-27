@@ -140,25 +140,24 @@ export function PackageSearch({ packages, setPackages }: PackageSearchProps) {
       )}
 
       {packages.length > 0 && (
-        <div className="flex flex-col items-center gap-3 mt-4">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {packages.map((pkg, idx) => (
-              <Badge
-                key={pkg}
-                className="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-900 transition-all hover:opacity-80 hover:line-through hover:shadow-md"
-                style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
-                onClick={() => handleRemove(pkg)}
-                title={`Remove ${pkg}`}
-              >
-                {pkg}
-              </Badge>
-            ))}
-          </div>
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+          {packages.map((pkg, idx) => (
+            <Badge
+              key={pkg}
+              className="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-900 transition-all hover:opacity-80 hover:line-through hover:shadow-md"
+              style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}
+              onClick={() => handleRemove(pkg)}
+              title={`Remove ${pkg}`}
+            >
+              {pkg}
+            </Badge>
+          ))}
+          <div className="h-6 w-px bg-border mr-1 ml-4" />
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => setPackages([])} 
-            className="text-muted-foreground hover:text-foreground h-8 text-xs px-3"
+            className="text-muted-foreground hover:text-foreground h-9 text-xs px-3"
           >
             Clear all
           </Button>
